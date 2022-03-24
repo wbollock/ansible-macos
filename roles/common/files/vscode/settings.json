@@ -1,0 +1,24 @@
+{
+    "files.autoSave": "afterDelay",
+    "editor.fontSize": 14,
+    "workbench.editorAssociations": {
+        "*.ipynb": "jupyter-notebook"
+    },
+    "workbench.startupEditor": "none",
+    "security.workspace.trust.untrustedFiles": "open",
+    "diffEditor.ignoreTrimWhitespace": false,
+    "workbench.iconTheme": "Monokai Pro (Filter Spectrum) Icons",
+    "editor.wordWrap": "on",
+    "notebook.cellToolbarLocation": {
+        "default": "right",
+        "jupyter-notebook": "left"
+    },
+    "cSpell.enableFiletypes": [
+        "perl",
+        "sls"
+    ],
+    "workbench.colorTheme": "Monokai Pro (Filter Spectrum)",
+    "git.autofetch": true,
+    "cSpell.enabled": true,
+    "window.zoomLevel": 1
+}

@@ -1,0 +1,6 @@
+[submodule "roles/common/files/vim"]
+	path = roles/common/files/vim
+	url = git@github.com:wbollock/.vim.git
+[submodule "roles/common/files/tmux"]
+	path = roles/common/files/tmux
+	url = git@github.com:wbollock/tmux.git

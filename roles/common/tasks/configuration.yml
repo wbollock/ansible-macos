@@ -1,0 +1,82 @@
+---
+# install packages
+
+- name: Set generic facts
+  set_fact:
+    user: wbollock
+
+- name: Set facts for MacOS
+  set_fact:
+    tmuxconf_path: "/Users/{{ user }}/.tmux/tmux.conf"
+    vimrc_path: "/Users/{{ user }}/.vimrc"
+    vimwiki_path: "/Users/{{ user }}/vimwiki"
+  when: ansible_facts['os_family']|lower == 'darwin' 
+
+- name: Set facts for Debian
+  set_fact:
+    tmuxconf_path: "/home/{{ user }}/.tmux/tmux.conf"
+    vimrc_path: "/home/{{ user }}/.vimrc"
+    vimwiki_path: "/home/{{ user }}/vimwiki"
+  when: ansible_facts['os_family']|lower == 'debian' 
+
+- name: Configure vim
+  ansible.builtin.copy:
+    src: vim/vimrc
+    dest: "{{ vimrc_path }}"
+    mode: '0644'
+  register: vim
+
+- name: Install vim plugins
+  ansible.builtin.shell:
+    cmd: "vim +PlugInstall +qall"
+  when: vim.changed
+
+- name: Ensure vimwiki directory exists
+  ansible.builtin.file:
+    path: "{{ vimwiki_path }}"
+    state: directory
+    mode: '0755'
+
+- name: Configure tmux
+  ansible.builtin.copy:
+    src: tmux/tmux.conf
+    dest: "{{ tmuxconf_path }}"
+    mode: '0644'
+
+
+## iterm2
+- name: iterm2 shell integration install
+  ansible.builtin.shell:
+    cmd: "curl -L https://iterm2.com/shell_integration/install_shell_integration.sh | bash"
+  when: ansible_facts['os_family']|lower == 'darwin' 
+
+# there is no way to programmatically load an iterm2 profile
+- name: Copy over iterm2 profile
+  block:
+   - name: Create configuration folder
+     ansible.builtin.file:
+       path: "/Users/{{ user }}/Desktop/configs"
+       state: directory
+       mode: '0755'
+
+   # https://stackoverflow.com/questions/35211565/how-do-i-import-an-iterm2-profile
+   - name: Add iterm2 profiles - must add via GUI
+     ansible.builtin.copy:
+      src: iterm2/iterm2.json
+      dest: "/Users/{{ user }}/Desktop/configs/"
+      mode: '0755'
+
+# generate new extensons_list -> code --list-extensions > extensions_list
+# https://stackoverflow.com/questions/35368889/how-can-i-export-settings
+# need `code` binary
+# cat extensions_list | xargs -L 1 echo code --install-extension
+- name: Vscode extensions install
+  ansible.builtin.shell:
+    cmd: cat ../files/vscode/extensions_list | xargs -L 1 echo code --install-extension
+
+- name: Vscode settings install
+  ansible.builtin.copy:
+    src: vscode/settings.json
+    dest: /Users/{{ user }}/Library/Application\ Support/Code/User/settings.json
+    mode: '0644'
+  

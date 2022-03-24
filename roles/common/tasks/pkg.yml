@@ -1,0 +1,45 @@
+---
+# install packages
+
+- name: Install sane packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+  with_items:
+    - git
+    - vim
+    - tmux
+    - tldr
+    - jq
+    - kubectl
+    - curl
+    - fzf
+    - perl
+    - nmap
+    - tree
+    - wget
+    - s3cmd
+    - pssh
+    - go
+    - ansible
+    - ansible-lint
+    - flux
+    - wireshark
+  ignore_errors: yes
+  # errors ignored for some packages that aren't in standard repos
+
+- name: Install casks
+  community.general.homebrew_cask:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - iterm2
+    - discord
+    - firefox
+    - font-source-code-pro
+    - vagrant
+    - virtualbox
+    - amethyst
+    - visual-studio-code
+  when: ansible_facts['os_family']|lower == 'darwin'
+  ignore_errors: yes
+  # un-set this when I deal with vscode already installed

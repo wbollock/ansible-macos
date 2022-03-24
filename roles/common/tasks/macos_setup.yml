@@ -1,0 +1,21 @@
+---
+# setup for MacOS
+# https://stackoverflow.com/a/70809037
+- name: Gather installed Homebrew binary
+  block:
+   - name: try using homebrew in check_mode (no changes)
+     community.general.homebrew:
+       update_homebrew: true
+     check_mode: true
+
+   - name: Homebrew available
+     debug:
+       msg: Homebrew is installed
+  rescue:
+   - name: Install Homebrew if not found
+     ansible.builtin.shell: 
+       cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+- name: Update homebrew
+  community.general.homebrew:
+    update_homebrew: true
