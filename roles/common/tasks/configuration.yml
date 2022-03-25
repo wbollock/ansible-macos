@@ -5,18 +5,25 @@
   set_fact:
     user: wbollock
 
-- name: Set facts for MacOS
+- name: Set home path for MacOS
   set_fact:
-    tmuxconf_path: "/Users/{{ user }}/.tmux/tmux.conf"
-    vimrc_path: "/Users/{{ user }}/.vimrc"
-    vimwiki_path: "/Users/{{ user }}/vimwiki"
+    home_path: "/Users/{{ user }}"
+  when: ansible_facts['os_family']|lower == 'darwin' 
+
+- name: Set various facts for MacOS
+  set_fact:
+    tmuxconf_path: "{{ home_path }}/.tmux/tmux.conf"
+    vimrc_path: "{{ home_path }}/.vimrc"
+    vimwiki_path: "{{ home_path }}/vimwiki"
+    zprezto_path: "{{ home_path }}/.zprezto"
   when: ansible_facts['os_family']|lower == 'darwin' 
 
 - name: Set facts for Debian
   set_fact:
-    tmuxconf_path: "/home/{{ user }}/.tmux/tmux.conf"
-    vimrc_path: "/home/{{ user }}/.vimrc"
-    vimwiki_path: "/home/{{ user }}/vimwiki"
+    home_path: "/home/{{ user }}"
+    tmuxconf_path: "{{ home_path }}/.tmux/tmux.conf"
+    vimrc_path: "{{ home_path }}/.vimrc"
+    vimwiki_path: "{{ home_path }}/vimwiki"
   when: ansible_facts['os_family']|lower == 'debian' 
 
 - name: Configure vim
@@ -55,7 +62,7 @@
   block:
    - name: Create configuration folder
      ansible.builtin.file:
-       path: "/Users/{{ user }}/Desktop/configs"
+       path: "{{ home_path }}/Desktop/configs"
        state: directory
        mode: '0755'
 
@@ -63,7 +70,7 @@
    - name: Add iterm2 profiles - must add via GUI
      ansible.builtin.copy:
       src: iterm2/iterm2.json
-      dest: "/Users/{{ user }}/Desktop/configs/"
+      dest: "{{ home_path }}/Desktop/configs/"
       mode: '0755'
 
 # generate new extensons_list -> code --list-extensions > extensions_list
@@ -77,6 +84,72 @@
 - name: Vscode settings install
   ansible.builtin.copy:
     src: vscode/settings.json
-    dest: /Users/{{ user }}/Library/Application\ Support/Code/User/settings.json
+    dest: "{{ home_path }}/Library/Application Support/Code/User/settings.json"
     mode: '0644'
-  
+
+
+# todo - set environment variables, zshrc, bashrc?, git config, aliases
+
+# ZSH - https://github.com/wbollock/ansible/blob/master/roles/common/tasks/zsh.yaml
+- name: Clone Prezto
+  git: 
+    repo: https://github.com/sorin-ionescu/prezto.git
+    dest: "{{ zprezto_path }}"
+    recursive: yes
+    force: yes
+  register: clone_prezto
+# note: force yes will overwrite changes
+
+- name: Setup Prezto
+  file: 
+    src: '{{ home_path }}/{{ item.src}}'
+    dest: '{{ home_path }}/{{ item.dest}}'
+    state: link
+  loop:
+    - { src: .zprezto/runcoms/zlogin, dest: .zlogin }
+    - { src: .zprezto/runcoms/zlogout, dest: .zlogout }
+  #  - { src: .zprezto/runcoms/zpreztorc, dest: .zpreztorc }
+    - { src: .zprezto/runcoms/zprofile, dest: .zprofile }
+    - { src: .zprezto/runcoms/zshenv, dest: .zshenv }
+    # - { src: .zprezto/runcoms/zshrc, dest: .zshrc }
+
+- name: Copy over custom zshrc
+  ansible.builtin.copy:
+    src: zsh/zshrc
+    dest: "{{ home_path }}/.zshrc"
+    mode: '0755'
+
+- name: Download auto suggestions
+  git: 
+    repo: https://github.com/zsh-users/zsh-autosuggestions
+    dest: "{{ home_path }}/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  when: clone_prezto.changed
+  ignore_errors: yes
+  # error if already exists
+
+- name: Set zpreztorc configuration, including theme and auto suggestions
+  copy:
+    src: zsh/zpreztorc
+    dest: "{{ home_path }}/.zpreztorc"
+    owner: "{{ user }}"
+    # group: "{{ user }}"
+    mode: '0700'
+
+- name: Enable zsh for {{ user }}, if user does not exist in /etc/passwd
+  blockinfile:
+    path: "{{ home_path }}/.profile"
+    block: |
+      if [ "$SHELL" != "/bin/zsh" ]
+      then
+          export SHELL="/bin/zsh"
+          exec /bin/zsh -l    # -l: login shell again
+      fi
+  when: ansible_facts['os_family']|lower == 'debian'
+
+- name: Recursively set permissions on ~/.config
+  file:
+    path: "{{ home_path }}/.config"
+    state: directory
+    recurse: yes
+    owner: "{{ user }}"
+    # group: "{{ user }}"
