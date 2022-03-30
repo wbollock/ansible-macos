@@ -36,6 +36,8 @@ alias k='kubectl'
 # kubectl auto complete
 [[ /usr/local/bin/kubectl ]] && source <(kubectl completion zsh)
 
+alias tldr='tldr --linux'
+
 ### Linode-specific ###
 
 # hss for scping files
