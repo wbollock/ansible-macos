@@ -73,6 +73,11 @@ export APPLE_SSH_ADD_BEHAVIOR="macos"
 export TERM=xterm-256color
 
 
+## Launch caffeine in the background
+if ! command -v caffeinate &> /dev/null; then
+     screen -dmS caffeinate caffeinate -u -d -i -m -s
+fi
+
 ### MISC CONFIGS ###
 
 # https://unix.stackexchange.com/questions/212127/zsh-disable-file-exists-warning-with-redirection

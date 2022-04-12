@@ -24,6 +24,7 @@
     - ansible-lint
     - flux
     - wireshark
+    - htop
   ignore_errors: yes
   # errors ignored for some packages that aren't in standard repos
 
