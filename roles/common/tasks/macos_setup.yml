@@ -19,3 +19,9 @@
 - name: Update homebrew
   community.general.homebrew:
     update_homebrew: true
+
+# https://osxdaily.com/2010/06/22/remove-the-last-login-message-from-the-terminal/
+- name: Hush login
+  ansible.builtin.file:
+    path: /Users/{{ user }}/.hushlogin
+    state: present

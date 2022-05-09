@@ -13,7 +13,6 @@ fi
 # Customize to your needs...
 export PATH=$PATH:~/bin
 
-
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
@@ -36,8 +35,6 @@ alias k='kubectl'
 # kubectl auto complete
 [[ /usr/local/bin/kubectl ]] && source <(kubectl completion zsh)
 
-alias tldr='tldr --linux'
-
 ### Linode-specific ###
 
 # hss for scping files
@@ -52,8 +49,13 @@ alias sshsiege='ssh root@23.239.30.73'
 # my big linode
 alias sshbeefy='ssh root@23.92.26.83'
 
+# my vanilla debian test linode
+alias sshdebian='ssh root@45.79.143.149'
+
 alias startvpn='osascript -e "tell application \"/Applications/Tunnelblick.app\"" -e "connect \"SSL VPN\"" -e "end tell"'
 
+# ansible linode
+alias sshansible="ssh -A root@50.116.55.145"
 
 ### ENVIRONMENT VARS ###
 
@@ -65,6 +67,8 @@ export PATH="/usr/local/opt/ruby/bin:$PATH"
 #export PATH="/Users/wbollock/.gem/ruby/3.0.0/bin:$PATH"
 export PATH="/usr/local/lib/ruby/gems/3.0.0/bin/:$PATH"
 
+export PATH="/Users/wbollock/.cargo/bin/:$PATH"
+
 # some Montery stuff
 export APPLE_SSH_ADD_BEHAVIOR="macos"
 
@@ -74,9 +78,16 @@ export TERM=xterm-256color
 
 
 ## Launch caffeine in the background
-if ! command -v caffeinate &> /dev/null; then
-     screen -dmS caffeinate caffeinate -u -d -i -m -s
-fi
+#if ! command -v caffeinate &> /dev/null; then
+#     screen -dmS caffeinate caffeinate -u -d -i -m -s
+#fi
+
+### brew curl vars ###
+# needed for compilers to use curl #
+export LDFLAGS="-L/usr/local/opt/curl/lib"
+export CPPFLAGS="-I/usr/local/opt/curl/include"
+export PKG_CONFIG_PATH="/usr/local/opt/curl/lib/pkgconfig"
+
 
 ### MISC CONFIGS ###
 

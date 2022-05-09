@@ -25,7 +25,7 @@
     - flux
     - wireshark
     - htop
-  ignore_errors: yes
+  ignore_errors: true
   # errors ignored for some packages that aren't in standard repos
 
 - name: Install casks
@@ -42,5 +42,5 @@
     - amethyst
     - visual-studio-code
   when: ansible_facts['os_family']|lower == 'darwin'
-  ignore_errors: yes
+  ignore_errors: true
   # un-set this when I deal with vscode already installed

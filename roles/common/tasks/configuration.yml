@@ -1,10 +1,6 @@
 ---
 # install packages
 
-- name: Set generic facts
-  set_fact:
-    user: wbollock
-
 - name: Set home path for MacOS
   set_fact:
     home_path: "/Users/{{ user }}"
