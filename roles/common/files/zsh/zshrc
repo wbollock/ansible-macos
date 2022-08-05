@@ -13,6 +13,7 @@ fi
 # Customize to your needs...
 export PATH=$PATH:~/bin
 
+
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
@@ -24,10 +25,11 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 alias sshkey='ssh-add -K ~/.ssh/id_rsa'
 
 # mac ssh agent woes
-alias killssh='killall ssh-agent;killall ssh;ssh-add ~/.ssh/id_rsa'
+alias killssh='killall ssh-agent; killall ssh; ssh-add -K ~/.ssh/id_rsa'
 
 # study ckad
-alias studyckad="open -a Firefox 'https://www.udemy.com/course/certified-kubernetes-application-developer/learn' && code ~/github/private_notes/ckad"
+#alias studyckad="open -a Firefox 'https://www.udemy.com/course/certified-kubernetes-application-developer/learn' && code ~/github/private_notes/ckad"
+#alias studygo="open -a Firefox 'https://quii.gitbook.io/learn-go-with-tests/' && code --new-window"
 
 # kube
 alias k='kubectl'
@@ -43,6 +45,9 @@ alias pcs='scp -S hss'
 # linagios test linode
 alias sshlinagios='ssh root@96.126.108.120'
 
+# nagios-xi test linode
+alias sshnagios='ssh root@139.144.16.126'
+
 # my siege linode
 alias sshsiege='ssh root@23.239.30.73'
 
@@ -51,6 +56,8 @@ alias sshbeefy='ssh root@23.92.26.83'
 
 # my vanilla debian test linode
 alias sshdebian='ssh root@45.79.143.149'
+
+alias sshdev='ssh -A root@172.104.12.43'
 
 alias startvpn='osascript -e "tell application \"/Applications/Tunnelblick.app\"" -e "connect \"SSL VPN\"" -e "end tell"'
 
@@ -88,10 +95,17 @@ export LDFLAGS="-L/usr/local/opt/curl/lib"
 export CPPFLAGS="-I/usr/local/opt/curl/include"
 export PKG_CONFIG_PATH="/usr/local/opt/curl/lib/pkgconfig"
 
+export LINODE_TOKEN=""
+export LINODE_API_KEY=""
+
+export LINODE_ACCESS_TOKEN=$LINODE_TOKEN
 
 ### MISC CONFIGS ###
 
 # https://unix.stackexchange.com/questions/212127/zsh-disable-file-exists-warning-with-redirection
 setopt clobber
+
+# coreutils path
+PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
