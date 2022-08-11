@@ -14,6 +14,12 @@
     - i3-gaps
     - apt-transport-https
     - ca-certificates
+    - flameshot
+    - nitrogen
+    - terminator
+    - picom
+    - copyq
+    - pavucontrol
 
 - name: Install ansible
   ansible.builtin.pip:
@@ -34,3 +40,95 @@
     - name: Install kubectl
       ansible.builtin.package:
         name: "kubectl"
+
+# TODO - have to do this manually as we're using a local ansible connection that doesn't have our ssh key
+# - name: Clone dotfiles
+#   ansible.builtin.git:
+#     repo: "git@github.com:wbollock/.config.git"
+#     dest: /home/wbollock/repos/github/config/
+#     version: master
+
+- name: Install polybar dependencies
+  ansible.builtin.apt:
+    pkg:
+      - cmake
+      - cmake-data
+      - libcairo2-dev
+      - libxcb1-dev
+      - libxcb-ewmh-dev
+      - libxcb-icccm4-dev
+      - libxcb-image0-dev
+      - libxcb-randr0-dev
+      - libxcb-util0-dev
+      - libxcb-xkb-dev
+      - pkg-config
+      - python3-xcbgen
+      - xcb-proto
+      - libxcb-xrm-dev
+      - libasound2-dev
+      - libmpdclient-dev
+      - libiw-dev
+      - libcurl4-openssl-dev
+      - libpulse-dev
+      - libxcb-composite0-dev
+      - libjsoncpp-dev
+      - python3-sphinx
+      - libuv1-dev
+    state: present
+
+# - name: Make some symlink I guess
+#   ansible.builtin.file:
+#    path: /usr/include/jsoncpp/json/
+#    dest: /usr/include/json
+#    state: link
+
+- name: Git clone polybar
+  ansible.builtin.git:
+    repo: "https://github.com/jaagr/polybar.git"
+    dest: /home/wbollock/repos/github/polybar
+    version: master
+
+# TODO manually - cd and ./build in polybar repo
+
+- name: Make polybar dir
+  ansible.builtin.file:
+    path: /home/wbollock/.config/polybar/
+    owner: wbollock
+    group: users
+    state: directory
+
+- name: Make polybar scripts dir
+  ansible.builtin.file:
+    path: /home/wbollock/.config/polybar/scripts/
+    owner: wbollock
+    group: users
+    state: directory
+
+- name: Copy polybar dotfile
+  ansible.builtin.copy:
+    src: /home/wbollock/repos/github/config/polybar/config
+    dest: /home/wbollock/.config/polybar/config
+    owner: wbollock
+    group: users
+
+- name: Copy polybar launch script
+  ansible.builtin.copy:
+    src: /home/wbollock/repos/github/config/polybar/launch.sh
+    dest: /home/wbollock/.config/polybar/launch.sh
+    owner: wbollock
+    group: users
+    mode: '0744'
+
+- name: Copy polybar scripts
+  ansible.builtin.copy:
+    src: /home/wbollock/repos/github/config/polybar/scripts/
+    dest: /home/wbollock/.config/polybar/scripts/
+    owner: wbollock
+    group: users
+
+- name: Provide i3 dotifle
+  ansible.builtin.copy:
+    src: /home/wbollock/repos/github/config/i3/config
+    dest: /home/wbollock/.config/i3/config
+    owner: wbollock
+    group: users
