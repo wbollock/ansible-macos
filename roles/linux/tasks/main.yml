@@ -1,0 +1,5 @@
+---
+# tasks file for common
+
+- name: Do Linux setup
+  import_tasks: linux_setup.yml

@@ -1,0 +1,36 @@
+---
+# install packages
+
+- name: Install i3-gaps PPA
+  ansible.builtin.apt_repository:
+    repo: 'ppa:regolith-linux/release'
+
+- name: Install linux packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+  with_items:
+    - python3-pip
+    - redshift
+    - i3-gaps
+    - apt-transport-https
+    - ca-certificates
+
+- name: Install ansible
+  ansible.builtin.pip:
+    name: ansible
+    extra_args: --user
+
+- name: Install kubectl
+  block: 
+    - name: Get Google Cloud signing key
+      ansible.builtin.get_url:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+
+    - name: Add kubectl repo
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main"
+
+    - name: Install kubectl
+      ansible.builtin.package:
+        name: "kubectl"

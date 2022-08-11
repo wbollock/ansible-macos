@@ -1,3 +1,11 @@
 - hosts: localhost
+  become: true
   roles:
-    - common
+    - role: common
+    - role: linux
+      when: ansible_facts['os_family']|lower == 'debian' 
+    - role: macos
+      when: ansible_facts['os_family']|lower == 'debian' 
+    - role: fubarhouse.golang
+    # TODO - if linux, do linux role. else do macos
+    # ansible_facts['os_family']|lower == 'darwin' 
