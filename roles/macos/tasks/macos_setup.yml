@@ -1,0 +1,93 @@
+---
+# setup for MacOS
+# https://stackoverflow.com/a/70809037
+- name: Gather installed Homebrew binary
+  block:
+   - name: try using homebrew in check_mode (no changes)
+     community.general.homebrew:
+       update_homebrew: true
+     check_mode: true
+
+   - name: Homebrew available
+     debug:
+       msg: Homebrew is installed
+  rescue:
+   - name: Install Homebrew if not found
+     ansible.builtin.shell: 
+       cmd: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+- name: Update homebrew
+  community.general.homebrew:
+    update_homebrew: true
+
+# https://osxdaily.com/2010/06/22/remove-the-last-login-message-from-the-terminal/
+- name: Hush login
+  ansible.builtin.file:
+    path: /Users/{{ user }}/.hushlogin
+    state: present
+
+
+- name: Install casks
+  community.general.homebrew_cask:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - iterm2
+    - discord
+    - firefox
+    - font-source-code-pro
+    - vagrant
+    - virtualbox
+    - amethyst
+    - visual-studio-code
+  when: ansible_facts['os_family']|lower == 'darwin'
+  ignore_errors: true
+  # un-set this when I deal with vscode already installed
+
+
+# install packages
+- name: Install packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+  with_items:
+    - kubectl
+    - flux
+    - go
+
+## iterm2
+- name: iterm2 shell integration install
+  ansible.builtin.shell:
+    cmd: "curl -L https://iterm2.com/shell_integration/install_shell_integration.sh | bash"
+
+# there is no way to programmatically load an iterm2 profile
+- name: Copy over iterm2 profile
+  block:
+   - name: Create configuration folder
+     ansible.builtin.file:
+       path: "{{ home_path }}/Desktop/configs"
+       state: directory
+       mode: '0755'
+
+   # https://stackoverflow.com/questions/35211565/how-do-i-import-an-iterm2-profile
+   - name: Add iterm2 profiles - must add via GUI
+     ansible.builtin.copy:
+      src: iterm2/iterm2.json
+      dest: "{{ home_path }}/Desktop/configs/"
+      mode: '0755'
+
+- name: Enable zsh for {{ user }}, if user does not exist in /etc/passwd
+  blockinfile:
+    path: "{{ home_path }}/.profile"
+    block: |
+      if [ "$SHELL" != "/bin/zsh" ]
+      then
+          export SHELL="/bin/zsh"
+          exec /bin/zsh -l    # -l: login shell again
+      fi
+
+- name: Recursively set permissions on ~/.config
+  file:
+    path: "{{ home_path }}/.config"
+    state: directory
+    recurse: yes
+    owner: "{{ user }}"

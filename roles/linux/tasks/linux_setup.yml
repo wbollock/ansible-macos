@@ -1,0 +1,235 @@
+---
+# install packages
+
+- name: Install i3-gaps PPA
+  ansible.builtin.apt_repository:
+    repo: 'ppa:regolith-linux/release'
+
+- name: Install solarr stable ppa
+  ansible.builtin.apt_repository:
+    repo: 'ppa:regolith-linux/release'
+
+- name: Install Spotify
+  block:
+    - name: Get Spotify key
+      ansible.builtin.apt_key:
+        url: https://download.spotify.com/debian/pubkey_5E3C45D7B312C643.gpg
+        state: present
+
+    - name: Add spotify repo
+      ansible.builtin.apt_repository:
+        repo: "deb http://repository.spotify.com stable non-free"
+
+    - name: Install spotify
+      ansible.builtin.package:
+        name: "spotify-client"
+
+- name: Install linux packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+  with_items:
+    - python3-pip
+    - redshift
+    - i3-gaps
+    - apt-transport-https
+    - ca-certificates
+    - flameshot
+    - nitrogen
+    - terminator
+    - picom
+    - copyq
+    - pavucontrol
+    - rofi
+    - solaar
+    - gnupg
+    - lsb-release
+    - v4l-utils # webcam controls - use v4l2-ctl
+    - thunar
+    - nerd-font-iosevka
+    - xfce4-terminal
+
+- name: Install kubectl
+  block: 
+    - name: Get Google Cloud signing key
+      ansible.builtin.get_url:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+
+    - name: Add kubectl repo
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main"
+
+    - name: Install kubectl
+      ansible.builtin.package:
+        name: "kubectl"
+
+- name: Install Docker
+  block: 
+    - name: Add Docker GPG apt Key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      ansible.builtin.apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      ansible.builtin.apt:
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: latest
+        update_cache: true
+
+# TODO - have to do this manually as we're using a local ansible connection that doesn't have our ssh key
+# - name: Clone dotfiles
+#   ansible.builtin.git:
+#     repo: "git@github.com:wbollock/.config.git"
+#     dest: /home/wbollock/repos/github/config/
+#     version: master
+
+- name: Install vagrant
+  block:
+    - name: Install Hashicorp key
+      ansible.builtin.apt_key:
+        url: https://apt.releases.hashicorp.com/gpg
+        state: present
+
+    - name: Add hashicorp repo
+      ansible.builtin.apt_repository:
+        repo: "deb https://apt.releases.hashicorp.com focal main"
+
+    - name: Install vagrant and kitchen stuff
+      ansible.builtin.package:
+        name: "{{ item }}"
+      with_items:
+        - virtualbox
+        - ruby-full
+        - python3-virtualenvwrapper
+
+- name: Install polybar dependencies
+  ansible.builtin.apt:
+    pkg:
+      - cmake
+      - cmake-data
+      - libcairo2-dev
+      - libxcb1-dev
+      - libxcb-ewmh-dev
+      - libxcb-icccm4-dev
+      - libxcb-image0-dev
+      - libxcb-randr0-dev
+      - libxcb-util0-dev
+      - libxcb-xkb-dev
+      - pkg-config
+      - python3-xcbgen
+      - xcb-proto
+      - libxcb-xrm-dev
+      - libasound2-dev
+      - libmpdclient-dev
+      - libiw-dev
+      - libcurl4-openssl-dev
+      - libpulse-dev
+      - libxcb-composite0-dev
+      - libjsoncpp-dev
+      - python3-sphinx
+      - libuv1-dev
+    state: present
+
+- name: Git clone polybar
+  ansible.builtin.git:
+    repo: "https://github.com/jaagr/polybar.git"
+    dest: /home/wbollock/repos/github/polybar
+    version: master
+
+# TODO - manually - cd and ./build in polybar repo
+
+- name: Make polybar dir
+  ansible.builtin.file:
+    path: /home/wbollock/.config/polybar/
+    owner: wbollock
+    group: users
+    state: directory
+
+- name: Make polybar scripts dir
+  ansible.builtin.file:
+    path: /home/wbollock/.config/polybar/scripts/
+    owner: wbollock
+    group: users
+    state: directory
+
+- name: Copy polybar dotfile
+  ansible.builtin.file:
+    src: /home/wbollock/repos/github/config/polybar/config
+    dest: /home/wbollock/.config/polybar/config
+    owner: wbollock
+    group: users
+    state: link
+
+- name: Copy polybar launch script
+  ansible.builtin.file:
+    src: /home/wbollock/repos/github/config/polybar/launch.sh
+    dest: /home/wbollock/.config/polybar/launch.sh
+    owner: wbollock
+    group: users
+    mode: '0744'
+    state: link
+
+- name: Copy polybar scripts
+  ansible.builtin.file:
+    src: /home/wbollock/repos/github/config/polybar/scripts/{{ item }}
+    dest: /home/wbollock/.config/polybar/scripts/{{ item }}
+    owner: wbollock
+    group: users
+    state: link
+  with_items:
+    - count-updates.sh
+    - kraken-btc.sh
+    - kraken-eth.sh
+    - redshift_env.sh
+    - redshift.sh
+
+- name: Provide i3 dotfile
+  ansible.builtin.file:
+    src: /home/wbollock/repos/github/config/i3/config
+    dest: /home/wbollock/.config/i3/config
+    owner: wbollock
+    group: users
+    state: link
+
+
+- name: Install PulseAudio Control for polybar
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/marioortizmanero/polybar-pulseaudio-control/master/pulseaudio-control.bash
+    dest: /usr/local/bin/pulseaudio-control
+    mode: '755'
+    owner: root
+    group: root
+
+# TODO - fonts.. bitcoin and slack
+# TODO - create regular backup of zsh history
+
+- name: Install tmuxer
+  ansible.builtin.git:
+    repo: "https://github.com/tjhop/tmuxer.git"
+    dest: /home/wbollock/repos/github/tmuxer
+    version: master
+
+- name: Symlink tmuxer to $PATH
+  ansible.builtin.file:
+    src: /home/wbollock/repos/github/tmuxer/tmuxer
+    dest: /usr/local/bin/tmuxer
+    owner: wbollock
+    group: users
+    state: link
+
+- name: Install asdf
+  ansible.builtin.git:
+    repo: "https://github.com/asdf-vm/asdf.git"
+    dest: /home/wbollock/.asdf
+    version:  v0.10.2
+    owner: wbollock
+    group: users

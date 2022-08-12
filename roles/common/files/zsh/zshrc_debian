@@ -1,0 +1,98 @@
+#
+# Executes commands at the start of an interactive session.
+#
+# Authors:
+#   Sorin Ionescu <sorin.ionescu@gmail.com>
+#
+
+# Source Prezto.
+if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
+  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+fi
+
+# Customize to your needs...
+export PATH=$PATH:~/bin
+
+
+source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+
+### ALIASES ###
+
+# add ssh key to something, don't need to re-auth ssh key each time
+# alias sshkey='ssh-add -K ~/.ssh/id_rsa'
+
+# mac ssh agent woes
+# alias killssh='killall ssh-agent; killall ssh; ssh-add -K ~/.ssh/id_rsa'
+
+# study ckad
+#alias studyckad="open -a Firefox 'https://www.udemy.com/course/certified-kubernetes-application-developer/learn' && code ~/github/private_notes/ckad"
+#alias studygo="open -a Firefox 'https://quii.gitbook.io/learn-go-with-tests/' && code --new-window"
+
+# kube
+alias k='kubectl'
+
+# kubectl auto complete
+[[ /usr/local/bin/kubectl ]] && source <(kubectl completion zsh)
+
+### Linode-specific ###
+
+# hss for scping files
+alias pcs='scp -S hss'
+
+# linagios test linode
+alias sshlinagios='ssh root@96.126.108.120'
+# nagios-xi test linode
+alias sshnagios='ssh root@139.144.16.126'
+# my siege linode
+alias sshsiege='ssh root@23.239.30.73'
+# my big linode
+alias sshbeefy='ssh root@23.92.26.83'
+# my vanilla debian test linode
+alias sshdebian='ssh root@45.79.143.149'
+alias sshdev='ssh -A root@172.104.12.43'
+# ansible linode
+alias sshansible="ssh -A root@50.116.55.145"
+alias startvpn="echo TODO"
+
+
+### ENVIRONMENT VARS ###
+
+export KUBE_EDITOR=/usr/bin/vim
+export VISUAL=/usr/bin/vim
+export EDITOR=$VISUAL
+
+# rust PATH
+export PATH="/home/wbollock/.cargo/bin/:$PATH"
+# pip PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# dbennet kitchen stuff
+
+# Python Virtualenvwrapper
+export WORKON_HOME=${HOME}/.virtualenvs
+export PROJECT_HOME=${HOME}/Development/
+source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+# User Ruby Path
+export GEM_HOME="${HOME}/.gem/ruby/$(ruby --version | sed -E 's/^.* ([0-9]+\.[0-9]+)\..*$/\1.0/')"
+export PATH=${PATH}:${GEM_HOME}/bin
+
+# init asdf
+# https://asdf-vm.com/guide/getting-started.html#_3-install-asdf
+. $HOME/.asdf/asdf.sh
+
+# fix term colors for tmux
+# https://unix.stackexchange.com/questions/1045/getting-256-colors-to-work-in-tmux
+export TERM=xterm-256color
+
+# put tokens in ~/.secrets/tokens
+source ~/.secrets/tokens
+
+### MISC CONFIGS ###
+
+# https://unix.stackexchange.com/questions/212127/zsh-disable-file-exists-warning-with-redirection
+setopt clobber
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

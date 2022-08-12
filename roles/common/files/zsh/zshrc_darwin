@@ -95,11 +95,6 @@ export LDFLAGS="-L/usr/local/opt/curl/lib"
 export CPPFLAGS="-I/usr/local/opt/curl/include"
 export PKG_CONFIG_PATH="/usr/local/opt/curl/lib/pkgconfig"
 
-export LINODE_TOKEN=""
-export LINODE_API_KEY=""
-
-export LINODE_ACCESS_TOKEN=$LINODE_TOKEN
-
 ### MISC CONFIGS ###
 
 # https://unix.stackexchange.com/questions/212127/zsh-disable-file-exists-warning-with-redirection

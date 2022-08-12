@@ -1,0 +1,6 @@
+---
+# tasks file for common
+
+- name: Do MacOS needfuls
+  import_tasks: macos_setup.yml
+  when: ansible_facts['os_family']|lower == 'darwin' 
