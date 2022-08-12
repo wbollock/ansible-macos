@@ -5,6 +5,25 @@
   ansible.builtin.apt_repository:
     repo: 'ppa:regolith-linux/release'
 
+- name: Install solarr stable ppa
+  ansible.builtin.apt_repository:
+    repo: 'ppa:regolith-linux/release'
+
+- name: Install Spotify
+  block:
+    - name: Get Spotify key
+      ansible.builtin.apt_key:
+        url: https://download.spotify.com/debian/pubkey_5E3C45D7B312C643.gpg
+        state: present
+
+    - name: Add spotify repo
+      ansible.builtin.apt_repository:
+        repo: "deb http://repository.spotify.com stable non-free"
+
+    - name: Install spotify
+      ansible.builtin.package:
+        name: "spotify-client"
+
 - name: Install linux packages
   ansible.builtin.package:
     name: "{{ item }}"
@@ -20,6 +39,10 @@
     - picom
     - copyq
     - pavucontrol
+    - rofi
+    - solaar
+    - gnupg
+    - lsb-release
 
 - name: Install ansible
   ansible.builtin.pip:
@@ -40,6 +63,28 @@
     - name: Install kubectl
       ansible.builtin.package:
         name: "kubectl"
+
+- name: Install Docker
+  block: 
+    - name: Add Docker GPG apt Key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      ansible.builtin.apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      ansible.builtin.apt:
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: latest
+        update_cache: true
 
 # TODO - have to do this manually as we're using a local ansible connection that doesn't have our ssh key
 # - name: Clone dotfiles
@@ -76,19 +121,13 @@
       - libuv1-dev
     state: present
 
-# - name: Make some symlink I guess
-#   ansible.builtin.file:
-#    path: /usr/include/jsoncpp/json/
-#    dest: /usr/include/json
-#    state: link
-
 - name: Git clone polybar
   ansible.builtin.git:
     repo: "https://github.com/jaagr/polybar.git"
     dest: /home/wbollock/repos/github/polybar
     version: master
 
-# TODO manually - cd and ./build in polybar repo
+# TODO - manually - cd and ./build in polybar repo
 
 - name: Make polybar dir
   ansible.builtin.file:
@@ -105,30 +144,52 @@
     state: directory
 
 - name: Copy polybar dotfile
-  ansible.builtin.copy:
+  ansible.builtin.file:
     src: /home/wbollock/repos/github/config/polybar/config
     dest: /home/wbollock/.config/polybar/config
     owner: wbollock
     group: users
+    state: link
 
 - name: Copy polybar launch script
-  ansible.builtin.copy:
+  ansible.builtin.file:
     src: /home/wbollock/repos/github/config/polybar/launch.sh
     dest: /home/wbollock/.config/polybar/launch.sh
     owner: wbollock
     group: users
     mode: '0744'
+    state: link
 
 - name: Copy polybar scripts
-  ansible.builtin.copy:
-    src: /home/wbollock/repos/github/config/polybar/scripts/
-    dest: /home/wbollock/.config/polybar/scripts/
+  ansible.builtin.file:
+    src: /home/wbollock/repos/github/config/polybar/scripts/{{ item }}
+    dest: /home/wbollock/.config/polybar/scripts/{{ item }}
     owner: wbollock
     group: users
+    state: link
+  with_items:
+    - count-updates.sh
+    - kraken-btc.sh
+    - kraken-eth.sh
+    - redshift_env.sh
+    - redshift.sh
 
-- name: Provide i3 dotifle
-  ansible.builtin.copy:
+- name: Provide i3 dotfile
+  ansible.builtin.file:
     src: /home/wbollock/repos/github/config/i3/config
     dest: /home/wbollock/.config/i3/config
     owner: wbollock
     group: users
+    state: link
+
+
+- name: Install PulseAudio Control for polybar
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/marioortizmanero/polybar-pulseaudio-control/master/pulseaudio-control.bash
+    dest: /usr/local/bin/pulseaudio-control
+    mode: '755'
+    owner: root
+    group: root
+
+# TODO - fonts.. bitcoin and slack
+# TODO - create regular backup of zsh history
