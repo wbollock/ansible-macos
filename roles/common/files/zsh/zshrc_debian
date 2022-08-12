@@ -61,21 +61,34 @@ alias startvpn="echo TODO"
 ### ENVIRONMENT VARS ###
 
 export KUBE_EDITOR=/usr/bin/vim
-export VISUAL=/usr/local/bin/vim
+export VISUAL=/usr/bin/vim
+export EDITOR=$VISUAL
 
 # rust PATH
 export PATH="/home/wbollock/.cargo/bin/:$PATH"
 # pip PATH
 export PATH="$HOME/.local/bin:$PATH"
 
+# dbennet kitchen stuff
+
+# Python Virtualenvwrapper
+export WORKON_HOME=${HOME}/.virtualenvs
+export PROJECT_HOME=${HOME}/Development/
+source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+# User Ruby Path
+export GEM_HOME="${HOME}/.gem/ruby/$(ruby --version | sed -E 's/^.* ([0-9]+\.[0-9]+)\..*$/\1.0/')"
+export PATH=${PATH}:${GEM_HOME}/bin
+
+# init asdf
+# https://asdf-vm.com/guide/getting-started.html#_3-install-asdf
+. $HOME/.asdf/asdf.sh
+
 # fix term colors for tmux
 # https://unix.stackexchange.com/questions/1045/getting-256-colors-to-work-in-tmux
 export TERM=xterm-256color
 
-export LINODE_TOKEN=""
-export LINODE_API_KEY=""
-
-export LINODE_ACCESS_TOKEN=$LINODE_TOKEN
+# put tokens in ~/.secrets/tokens
+source ~/.secrets/tokens
 
 ### MISC CONFIGS ###
 

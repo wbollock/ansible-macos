@@ -23,3 +23,16 @@
     - wireshark
     - htop
     - ripgrep
+    - nodejs
+    - npm
+
+- name: Install ansible
+  ansible.builtin.pip:
+    name: ansible
+    extra_args: --user
+
+- name: Install pip packages
+  ansible.builtin.pip:
+    name: "{{ item }}"
+  with_items:
+    - linode-cli

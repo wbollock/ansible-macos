@@ -43,11 +43,10 @@
     - solaar
     - gnupg
     - lsb-release
-
-- name: Install ansible
-  ansible.builtin.pip:
-    name: ansible
-    extra_args: --user
+    - v4l-utils # webcam controls - use v4l2-ctl
+    - thunar
+    - nerd-font-iosevka
+    - xfce4-terminal
 
 - name: Install kubectl
   block: 
@@ -92,6 +91,25 @@
 #     repo: "git@github.com:wbollock/.config.git"
 #     dest: /home/wbollock/repos/github/config/
 #     version: master
+
+- name: Install vagrant
+  block:
+    - name: Install Hashicorp key
+      ansible.builtin.apt_key:
+        url: https://apt.releases.hashicorp.com/gpg
+        state: present
+
+    - name: Add hashicorp repo
+      ansible.builtin.apt_repository:
+        repo: "deb https://apt.releases.hashicorp.com focal main"
+
+    - name: Install vagrant and kitchen stuff
+      ansible.builtin.package:
+        name: "{{ item }}"
+      with_items:
+        - virtualbox
+        - ruby-full
+        - python3-virtualenvwrapper
 
 - name: Install polybar dependencies
   ansible.builtin.apt:
@@ -193,3 +211,25 @@
 
 # TODO - fonts.. bitcoin and slack
 # TODO - create regular backup of zsh history
+
+- name: Install tmuxer
+  ansible.builtin.git:
+    repo: "https://github.com/tjhop/tmuxer.git"
+    dest: /home/wbollock/repos/github/tmuxer
+    version: master
+
+- name: Symlink tmuxer to $PATH
+  ansible.builtin.file:
+    src: /home/wbollock/repos/github/tmuxer/tmuxer
+    dest: /usr/local/bin/tmuxer
+    owner: wbollock
+    group: users
+    state: link
+
+- name: Install asdf
+  ansible.builtin.git:
+    repo: "https://github.com/asdf-vm/asdf.git"
+    dest: /home/wbollock/.asdf
+    version:  v0.10.2
+    owner: wbollock
+    group: users
