@@ -60,6 +60,13 @@
     dest: "{{ tmuxconf_path }}"
     mode: '0644'
 
+- name: Configure git
+  ansible.builtin.copy:
+    src: git/gitconfig
+    dest: "{{ home_path }}/.gitconfig"
+    owner: "{{ user }}"
+    mode: '0644'
+
 
 # screw it just uncomment the vscode extensions jawn
 # it doesn't like to run as root and getting `stat` of local files is a pain
