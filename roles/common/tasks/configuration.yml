@@ -32,6 +32,7 @@
   ansible.builtin.copy:
     src: vim/vimrc
     dest: "{{ vimrc_path }}"
+    owner: "{{ user }}"
     mode: '0644'
   register: vim
 
