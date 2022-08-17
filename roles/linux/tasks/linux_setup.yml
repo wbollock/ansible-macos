@@ -72,7 +72,7 @@
 
     - name: Add Docker Repository
       ansible.builtin.apt_repository:
-        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
         state: present
 
     - name: Update apt and install docker-ce
@@ -110,6 +110,21 @@
         - virtualbox
         - ruby-full
         - python3-virtualenvwrapper
+
+- name: Install Signal
+  block:
+    - name: Add Signal GPG apt Key
+      ansible.builtin.apt_key:
+        url: https://updates.signal.org/desktop/apt/keys.asc
+        state: present
+
+    - name: Add Signal repo
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://updates.signal.org/desktop/apt xenial main"
+
+    - name: Install Signal-Desktop
+      ansible.builtin.package:
+        name: "signal-desktop"
 
 - name: Install polybar dependencies
   ansible.builtin.apt:
@@ -215,7 +230,7 @@
 
 - name: Ensure rofi theme directory exists
   ansible.builtin.file:
-    path: "/home/wbollock/.config/rofi/themesq"
+    path: "/home/wbollock/.config/rofi/themes"
     state: directory
     mode: '0755'
 
