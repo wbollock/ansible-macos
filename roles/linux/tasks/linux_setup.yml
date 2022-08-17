@@ -47,6 +47,8 @@
     - thunar
     - nerd-font-iosevka
     - xfce4-terminal
+    - fonts-font-awesome
+    - direnv
 
 - name: Install kubectl
   block: 
@@ -129,6 +131,10 @@
 - name: Install Discord
   ansible.builtin.apt:
     deb: https://discord.com/api/download?platform=linux&format=deb
+
+- name: Install GitHub linode-cli
+  ansible.builtin.apt:
+    deb: https://github.com/cli/cli/releases/download/v2.14.4/gh_2.14.4_linux_amd64.deb
 
 - name: Install polybar dependencies
   ansible.builtin.apt:
@@ -252,9 +258,6 @@
     mode: '755'
     owner: root
     group: root
-
-# TODO - fonts.. bitcoin and slack
-# TODO - create regular backup of zsh history
 
 - name: Install tmuxer
   ansible.builtin.git:

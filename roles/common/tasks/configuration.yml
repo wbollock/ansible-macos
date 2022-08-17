@@ -114,9 +114,6 @@
     dest: "{{ vscode_path }}"
     mode: '0644'
 
-
-# todo - set environment variables, zshrc, bashrc?, git config, aliases
-
 # ZSH - https://github.com/wbollock/ansible/blob/master/roles/common/tasks/zsh.yaml
 - name: Clone Prezto
   git: 
@@ -151,7 +148,7 @@
     repo: https://github.com/zsh-users/zsh-autosuggestions
     dest: "{{ home_path }}/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
   when: clone_prezto.changed
-  ignore_errors: yes
+  ignore_errors: true
   # error if already exists
 
 - name: Set zpreztorc configuration, including theme and auto suggestions
@@ -160,3 +157,9 @@
     dest: "{{ home_path }}/.zpreztorc"
     owner: "{{ user }}"
     mode: '0700'
+
+- name: Backup zsh_history weekly
+  ansible.builtin.cron:
+    name: "zsh_history weekly backup"
+    special_time: weekly
+    job: "cp {{ home_path }}/.zsh_history {{ home_path }}/.zsh_history.BAK"

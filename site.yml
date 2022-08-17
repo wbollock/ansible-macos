@@ -5,7 +5,6 @@
     - role: linux
       when: ansible_facts['os_family']|lower == 'debian' 
     - role: macos
-      when: ansible_facts['os_family']|lower == 'debian' 
+      when: ansible_facts['os_family']|lower == 'darwin'
     - role: fubarhouse.golang
-    # TODO - if linux, do linux role. else do macos
-    # ansible_facts['os_family']|lower == 'darwin' 
+      when: ansible_facts['os_family']|lower == 'debian'
