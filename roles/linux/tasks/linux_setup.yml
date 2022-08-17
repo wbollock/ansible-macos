@@ -231,5 +231,19 @@
     repo: "https://github.com/asdf-vm/asdf.git"
     dest: /home/wbollock/.asdf
     version:  v0.10.2
+
+- name: Change file ownership, group and permissions
+  ansible.builtin.file:
+    path: /home/wbollock/.asdf
+    owner: wbollock
+    group: users
+    recurse: true
+    state: directory
+
+- name: Install act
+  ansible.builtin.unarchive:
+    src: https://github.com/nektos/act/releases/download/v0.2.30/act_Linux_x86_64.tar.gz
+    dest: /usr/local/bin/
+    remote_src: true
     owner: wbollock
     group: users
