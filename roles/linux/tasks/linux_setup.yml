@@ -200,6 +200,31 @@
     group: users
     state: link
 
+- name: Ensure rofi directory exists
+  ansible.builtin.file:
+    path: "/home/wbollock/.config/rofi/"
+    state: directory
+    mode: '0755'
+
+- name: Copy rofi config
+  ansible.builtin.copy:
+    src: rofi/config.rasi
+    dest: /home/wbollock/.config/rofi/config.rasi
+    owner: wbollock
+    group: users
+
+- name: Ensure rofi theme directory exists
+  ansible.builtin.file:
+    path: "/home/wbollock/.config/rofi/themesq"
+    state: directory
+    mode: '0755'
+
+- name: Copy rofi theme
+  ansible.builtin.copy:
+    src: rofi/themes/nord.rasi
+    dest: /home/wbollock/.config/rofi/themes/nord.rasi
+    owner: wbollock
+    group: users
 
 - name: Install PulseAudio Control for polybar
   ansible.builtin.get_url:
