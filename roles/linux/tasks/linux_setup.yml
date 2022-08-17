@@ -126,6 +126,10 @@
       ansible.builtin.package:
         name: "signal-desktop"
 
+- name: Install Discord
+  ansible.builtin.apt:
+    deb: https://discord.com/api/download?platform=linux&format=deb
+
 - name: Install polybar dependencies
   ansible.builtin.apt:
     pkg:
