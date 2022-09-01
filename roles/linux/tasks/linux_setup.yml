@@ -49,7 +49,14 @@
     - xfce4-terminal
     - fonts-font-awesome
     - direnv
+    - flatpak
 
+- name: Install linux pip packages
+  ansible.builtin.pip:
+    name: "{{ item }}"
+  with_items:
+    - i3ipc 
+          
 - name: Install kubectl
   block: 
     - name: Get Google Cloud signing key
@@ -103,7 +110,7 @@
 
     - name: Add hashicorp repo
       ansible.builtin.apt_repository:
-        repo: "deb https://apt.releases.hashicorp.com focal main"
+        repo: "deb [arch=amd64] https://apt.releases.hashicorp.com focal main"
 
     - name: Install vagrant and kitchen stuff
       ansible.builtin.package:
@@ -214,7 +221,6 @@
     - count-updates.sh
     - kraken-btc.sh
     - kraken-eth.sh
-    - redshift_env.sh
     - redshift.sh
 
 - name: Provide i3 dotfile
@@ -273,6 +279,14 @@
     group: users
     state: link
 
+- name: Symlink Go to $PATH
+  ansible.builtin.file:
+    src:  /usr/local/go/bin/go
+    dest: /usr/local/bin/go
+    owner: wbollock
+    group: users
+    state: link
+
 - name: Install asdf
   ansible.builtin.git:
     repo: "https://github.com/asdf-vm/asdf.git"
@@ -294,3 +308,41 @@
     remote_src: true
     owner: wbollock
     group: users
+
+- name: Install TablePlus
+  block:
+
+    - name: Add TablePlus repo
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://deb.tableplus.com/debian/20 tableplus main"
+
+    - name: Install TablePlus
+      ansible.builtin.package:
+        name: "tableplus"
+
+- name: Install PulseEffects via Flatpak
+  community.general.flatpak:
+    name:  https://dl.flathub.org/repo/appstream/com.github.wwmm.pulseeffects.flatpakref
+    state: present
+
+- name: check if i3 autotiling exists
+  stat: 
+    path: /home/wbollock/repos/github/autotiling
+  register: i3_autotiling
+
+- name: Git clone i3 autotiling
+  ansible.builtin.git:
+    repo: "https://github.com/nwg-piotr/autotiling.git"
+    dest: /home/wbollock/repos/github/autotiling
+    version: master
+  when: i3_autotiling.stat.exists == False
+  
+- name: Install goreleaser
+  block:
+    - name: Add goreleaser repo
+      ansible.builtin.apt_repository:
+        repo: "deb [trusted=yes] https://repo.goreleaser.com/apt/ /"
+
+    - name: Install TablePlus
+      ansible.builtin.package:
+        name: "goreleaser"

@@ -2,9 +2,9 @@
   become: true
   roles:
     - role: common
+    - role: fubarhouse.golang
+      when: ansible_facts['os_family']|lower == 'debian'
     - role: linux
       when: ansible_facts['os_family']|lower == 'debian' 
     - role: macos
       when: ansible_facts['os_family']|lower == 'darwin'
-    - role: fubarhouse.golang
-      when: ansible_facts['os_family']|lower == 'debian'
