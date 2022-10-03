@@ -112,13 +112,14 @@
       ansible.builtin.apt_repository:
         repo: "deb [arch=amd64] https://apt.releases.hashicorp.com focal main"
 
-    - name: Install vagrant and kitchen stuff
+    - name: Install vagrant, kitchen, vault
       ansible.builtin.package:
         name: "{{ item }}"
       with_items:
         - virtualbox
         - ruby-full
         - python3-virtualenvwrapper
+        - vault
 
 - name: Install Signal
   block:

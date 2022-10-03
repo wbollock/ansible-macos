@@ -18,12 +18,11 @@
     - wget
     - s3cmd
     - pssh
-    - ansible
-    - ansible-lint
     - wireshark
     - htop
     - ripgrep
     - nodejs
+    - shellcheck
     # - npm
 
 - name: Install ansible
@@ -41,3 +40,5 @@
     - testinfra
     - 2to3
     - black
+    - ansible
+    - ansible-lint
