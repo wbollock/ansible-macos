@@ -50,6 +50,8 @@
     - fonts-font-awesome
     - direnv
     - flatpak
+    - blueman
+    - calibre
 
 - name: Install linux pip packages
   ansible.builtin.pip:
