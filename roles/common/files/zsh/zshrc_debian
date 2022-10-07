@@ -79,6 +79,9 @@ source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 export GEM_HOME="${HOME}/.gem/ruby/$(ruby --version | sed -E 's/^.* ([0-9]+\.[0-9]+)\..*$/\1.0/')"
 export PATH=${PATH}:${GEM_HOME}/bin
 
+# go env path
+export PATH=${PATH}:/home/wbollock/go/bin
+
 # init asdf
 # https://asdf-vm.com/guide/getting-started.html#_3-install-asdf
 . $HOME/.asdf/asdf.sh

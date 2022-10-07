@@ -18,13 +18,12 @@
     - wget
     - s3cmd
     - pssh
-    - ansible
-    - ansible-lint
     - wireshark
     - htop
     - ripgrep
     - nodejs
-    - npm
+    - shellcheck
+    # - npm
 
 - name: Install ansible
   ansible.builtin.pip:
@@ -36,3 +35,10 @@
     name: "{{ item }}"
   with_items:
     - linode-cli
+    - salt-lint
+    - pytest
+    - testinfra
+    - 2to3
+    - black
+    - ansible
+    - ansible-lint

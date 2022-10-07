@@ -47,7 +47,18 @@
     - thunar
     - nerd-font-iosevka
     - xfce4-terminal
+    - fonts-font-awesome
+    - direnv
+    - flatpak
+    - blueman
+    - calibre
 
+- name: Install linux pip packages
+  ansible.builtin.pip:
+    name: "{{ item }}"
+  with_items:
+    - i3ipc 
+          
 - name: Install kubectl
   block: 
     - name: Get Google Cloud signing key
@@ -72,7 +83,7 @@
 
     - name: Add Docker Repository
       ansible.builtin.apt_repository:
-        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
         state: present
 
     - name: Update apt and install docker-ce
@@ -101,15 +112,39 @@
 
     - name: Add hashicorp repo
       ansible.builtin.apt_repository:
-        repo: "deb https://apt.releases.hashicorp.com focal main"
+        repo: "deb [arch=amd64] https://apt.releases.hashicorp.com focal main"
 
-    - name: Install vagrant and kitchen stuff
+    - name: Install vagrant, kitchen, vault
       ansible.builtin.package:
         name: "{{ item }}"
       with_items:
         - virtualbox
         - ruby-full
         - python3-virtualenvwrapper
+        - vault
+
+- name: Install Signal
+  block:
+    - name: Add Signal GPG apt Key
+      ansible.builtin.apt_key:
+        url: https://updates.signal.org/desktop/apt/keys.asc
+        state: present
+
+    - name: Add Signal repo
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://updates.signal.org/desktop/apt xenial main"
+
+    - name: Install Signal-Desktop
+      ansible.builtin.package:
+        name: "signal-desktop"
+
+- name: Install Discord
+  ansible.builtin.apt:
+    deb: https://discord.com/api/download?platform=linux&format=deb
+
+- name: Install GitHub linode-cli
+  ansible.builtin.apt:
+    deb: https://github.com/cli/cli/releases/download/v2.14.4/gh_2.14.4_linux_amd64.deb
 
 - name: Install polybar dependencies
   ansible.builtin.apt:
@@ -189,7 +224,6 @@
     - count-updates.sh
     - kraken-btc.sh
     - kraken-eth.sh
-    - redshift_env.sh
     - redshift.sh
 
 - name: Provide i3 dotfile
@@ -200,6 +234,31 @@
     group: users
     state: link
 
+- name: Ensure rofi directory exists
+  ansible.builtin.file:
+    path: "/home/wbollock/.config/rofi/"
+    state: directory
+    mode: '0755'
+
+- name: Copy rofi config
+  ansible.builtin.copy:
+    src: rofi/config.rasi
+    dest: /home/wbollock/.config/rofi/config.rasi
+    owner: wbollock
+    group: users
+
+- name: Ensure rofi theme directory exists
+  ansible.builtin.file:
+    path: "/home/wbollock/.config/rofi/themes"
+    state: directory
+    mode: '0755'
+
+- name: Copy rofi theme
+  ansible.builtin.copy:
+    src: rofi/themes/nord.rasi
+    dest: /home/wbollock/.config/rofi/themes/nord.rasi
+    owner: wbollock
+    group: users
 
 - name: Install PulseAudio Control for polybar
   ansible.builtin.get_url:
@@ -208,9 +267,6 @@
     mode: '755'
     owner: root
     group: root
-
-# TODO - fonts.. bitcoin and slack
-# TODO - create regular backup of zsh history
 
 - name: Install tmuxer
   ansible.builtin.git:
@@ -226,10 +282,70 @@
     group: users
     state: link
 
+- name: Symlink Go to $PATH
+  ansible.builtin.file:
+    src:  /usr/local/go/bin/go
+    dest: /usr/local/bin/go
+    owner: wbollock
+    group: users
+    state: link
+
 - name: Install asdf
   ansible.builtin.git:
     repo: "https://github.com/asdf-vm/asdf.git"
     dest: /home/wbollock/.asdf
     version:  v0.10.2
+
+- name: Change file ownership, group and permissions
+  ansible.builtin.file:
+    path: /home/wbollock/.asdf
     owner: wbollock
     group: users
+    recurse: true
+    state: directory
+
+- name: Install act
+  ansible.builtin.unarchive:
+    src: https://github.com/nektos/act/releases/download/v0.2.30/act_Linux_x86_64.tar.gz
+    dest: /usr/local/bin/
+    remote_src: true
+    owner: wbollock
+    group: users
+
+- name: Install TablePlus
+  block:
+
+    - name: Add TablePlus repo
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://deb.tableplus.com/debian/20 tableplus main"
+
+    - name: Install TablePlus
+      ansible.builtin.package:
+        name: "tableplus"
+
+- name: Install PulseEffects via Flatpak
+  community.general.flatpak:
+    name:  https://dl.flathub.org/repo/appstream/com.github.wwmm.pulseeffects.flatpakref
+    state: present
+
+- name: check if i3 autotiling exists
+  stat: 
+    path: /home/wbollock/repos/github/autotiling
+  register: i3_autotiling
+
+- name: Git clone i3 autotiling
+  ansible.builtin.git:
+    repo: "https://github.com/nwg-piotr/autotiling.git"
+    dest: /home/wbollock/repos/github/autotiling
+    version: master
+  when: i3_autotiling.stat.exists == False
+  
+- name: Install goreleaser
+  block:
+    - name: Add goreleaser repo
+      ansible.builtin.apt_repository:
+        repo: "deb [trusted=yes] https://repo.goreleaser.com/apt/ /"
+
+    - name: Install TablePlus
+      ansible.builtin.package:
+        name: "goreleaser"
