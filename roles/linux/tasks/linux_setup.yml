@@ -52,6 +52,7 @@
     - flatpak
     - blueman
     - calibre
+    - chrony
 
 - name: Install linux pip packages
   ansible.builtin.pip:
@@ -349,3 +350,9 @@
     - name: Install TablePlus
       ansible.builtin.package:
         name: "goreleaser"
+
+- name: Move scripts to /usr/local/bin/
+  ansible.builtin.copy:
+    src: scripts/
+    dest: /usr/local/bin/
+    mode: '0755'
