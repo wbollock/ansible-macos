@@ -55,7 +55,6 @@ alias sshdebian='ssh root@45.79.143.149'
 alias sshdev='ssh -A root@172.104.12.43'
 # ansible linode
 alias sshansible="ssh -A root@50.116.55.145"
-alias startvpn="echo TODO"
 
 
 ### ENVIRONMENT VARS ###
@@ -93,9 +92,17 @@ export TERM=xterm-256color
 # put tokens in ~/.secrets/tokens
 source ~/.secrets/tokens
 
+eval "$(direnv hook zsh)"
+
 ### MISC CONFIGS ###
 
 # https://unix.stackexchange.com/questions/212127/zsh-disable-file-exists-warning-with-redirection
 setopt clobber
+
+# https://github.com/junegunn/fzf.vim/issues/1125
+zle-line-init() {
+    zle -K viins # initiate `vi insert` as keymap (can be removed if `bindkey -V` has been set elsewhere)
+    echo -ne "\e[5 q"
+}
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
