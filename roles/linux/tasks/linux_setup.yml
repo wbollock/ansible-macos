@@ -24,6 +24,21 @@
       ansible.builtin.package:
         name: "spotify-client"
 
+- name: Install Lens
+  block:
+    - name: Get Lens key
+      ansible.builtin.apt_key:
+        url: https://downloads.k8slens.dev/keys/gpg
+        state: present
+
+    - name: Add Lens repo
+      ansible.builtin.apt_repository:
+        repo: "deb https://downloads.k8slens.dev/apt/debian stable main"
+
+    - name: Install lens
+      ansible.builtin.package:
+        name: "lens"
+
 - name: Install linux packages
   ansible.builtin.package:
     name: "{{ item }}"
@@ -53,6 +68,10 @@
     - blueman
     - calibre
     - chrony
+    - vim-gui-common
+    - exuberant-ctags # for perl ctags
+    - perltidy
+    - brightnessctl
 
 - name: Install linux pip packages
   ansible.builtin.pip:

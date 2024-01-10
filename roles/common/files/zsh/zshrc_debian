@@ -1,5 +1,4 @@
-#
-# Executes commands at the start of an interactive session.
+# # Executes commands at the start of an interactive session.
 #
 # Authors:
 #   Sorin Ionescu <sorin.ionescu@gmail.com>
@@ -18,8 +17,34 @@ source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
+# https://unix.stackexchange.com/questions/273861/unlimited-history-in-zsh
+HISTFILE=~/.zsh_history
+HISTSIZE=999999999
+SAVEHIST=$HISTSIZE
+
 
 ### ALIASES ###
+
+
+alias gs="git status"
+alias gcmasterpull="git checkout master; git pull upstream master"
+alias gcmainpull="git checkout main; git pull upstream main"
+alias gst="git status -sb"
+alias gl="git log"
+alias ga="git add"
+alias gaa="git add -A"
+alias gal="git add ."
+alias gall="git add ."
+alias gca="git commit -a"
+alias gc="git commit -m"
+alias gcot="git checkout"
+alias gchekout="git checkout"
+alias gchckout="git checkout"
+alias gckout="git checkout"
+#alias go="git push -u origin"
+alias gsh='git stash'
+alias gw='git whatchanged'
+alias gitlg="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
 
 # add ssh key to something, don't need to re-auth ssh key each time
 # alias sshkey='ssh-add -K ~/.ssh/id_rsa'
@@ -33,6 +58,8 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 
 # kube
 alias k='kubectl'
+alias kctx='kubectx'
+alias kns='kubens'
 
 # kubectl auto complete
 [[ /usr/local/bin/kubectl ]] && source <(kubectl completion zsh)
@@ -60,6 +87,7 @@ alias sshansible="ssh -A root@50.116.55.145"
 ### ENVIRONMENT VARS ###
 
 export KUBE_EDITOR=/usr/bin/vim
+export KUBECONFIG="${$(ls ~/.kube/config.d/*)//$'\n'/:}"
 export VISUAL=/usr/bin/vim
 export EDITOR=$VISUAL
 
@@ -67,6 +95,16 @@ export EDITOR=$VISUAL
 export PATH="/home/wbollock/.cargo/bin/:$PATH"
 # pip PATH
 export PATH="$HOME/.local/bin:$PATH"
+# hss path for linode_gear_info
+export PATH="$HOME/repos/forks/hss-config/:$PATH"
+# path for krew
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+# kind using podman
+KIND_EXPERIMENTAL_PROVIDER=podman
+
+ip-info(){
+    curl -s ipinfo.io/$1 | jq
+}
 
 # dbennet kitchen stuff
 
@@ -77,6 +115,12 @@ source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 # User Ruby Path
 export GEM_HOME="${HOME}/.gem/ruby/$(ruby --version | sed -E 's/^.* ([0-9]+\.[0-9]+)\..*$/\1.0/')"
 export PATH=${PATH}:${GEM_HOME}/bin
+
+# vault
+export VAULT_ADDR=https://vault.linode.com:8200
+
+# salt
+export SALT_KITCHEN_DRIVER="vagrant"
 
 # go env path
 export PATH=${PATH}:/home/wbollock/go/bin
@@ -101,7 +145,7 @@ setopt clobber
 
 # https://github.com/junegunn/fzf.vim/issues/1125
 zle-line-init() {
-    zle -K viins # initiate `vi insert` as keymap (can be removed if `bindkey -V` has been set elsewhere)
+    #zle -K viins # initiate `vi insert` as keymap (can be removed if `bindkey -V` has been set elsewhere)
     echo -ne "\e[5 q"
 }
 

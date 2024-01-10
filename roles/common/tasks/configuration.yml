@@ -14,6 +14,7 @@
   set_fact:
     tmuxconf_path: "{{ home_path }}/.tmux/tmux.conf"
     vimrc_path: "{{ home_path }}/.vimrc"
+    nvim_path: "{{ home_path }}/.config/nvim/init.vim"
     vimwiki_path: "{{ home_path }}/vimwiki"
     zprezto_path: "{{ home_path }}/.zprezto"
     vscode_path: "{{ home_path }}/Library/Application Support/Code/User/settings.json"
@@ -23,6 +24,7 @@
   set_fact:
     tmuxconf_path: "{{ home_path }}/.tmux/tmux.conf"
     vimrc_path: "{{ home_path }}/.vimrc"
+    nvim_path: "{{ home_path }}/.config/nvim/init.vim"
     vimwiki_path: "{{ home_path }}/vimwiki"
     zprezto_path: "{{ home_path }}/.zprezto"
     vscode_path: "{{ home_path }}/.config/Code/User/settings.json"
@@ -36,10 +38,23 @@
     mode: '0644'
   register: vim
 
+- name: Configure nvim
+  ansible.builtin.copy:
+    src: vim/vimrc
+    dest: "{{ nvim_path }}"
+    owner: "{{ user }}"
+    mode: '0644'
+  register: nvim
+
 - name: Install vim plugins
   ansible.builtin.shell:
     cmd: "vim +PlugInstall +qall"
   when: vim.changed
+
+- name: Install nvim plugins
+  ansible.builtin.shell:
+    cmd: "nvim +PlugInstall +qall"
+  when: nvim.changed
 
 - name: Ensure vimwiki directory exists
   ansible.builtin.file:

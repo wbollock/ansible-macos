@@ -42,3 +42,4 @@
     - black
     - ansible
     - ansible-lint
+    - pynvim
