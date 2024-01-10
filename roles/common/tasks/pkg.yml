@@ -23,6 +23,7 @@
     - ripgrep
     - nodejs
     - shellcheck
+    - neovim
     # - npm
 
 - name: Install ansible
